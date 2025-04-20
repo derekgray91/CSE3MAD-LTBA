@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255879940171",
+    "project_id": "microhabit-90960",
+    "storage_bucket": "microhabit-90960.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255879940171:android:55c15a06d61aafe49725ce",
+        "android_client_info": {
+          "package_name": "com.latrobebundooraapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7Ijn29hRmQMuKMkojMYpu9Cw0RYetv98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
