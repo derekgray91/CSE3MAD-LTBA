@@ -12,7 +12,12 @@
           "package_name": "com.latrobebundooraapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "255879940171-s0fdrbtieb4rifsivka5q1bhq9bqqvaj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB7Ijn29hRmQMuKMkojMYpu9Cw0RYetv98"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255879940171-s0fdrbtieb4rifsivka5q1bhq9bqqvaj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
