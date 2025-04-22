@@ -3,7 +3,7 @@ import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import '@react-native-firebase/storage';
 
-// Initialise Firebase if it hasn't been initialised yet
+// initialise Firebase
 if (!firebase.apps.length) {
   firebase.initializeApp();
 }
