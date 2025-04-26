@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
@@ -9,7 +10,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Import screens
-import { HomeScreen, DetailScreen, LoginScreen, RegisterScreen, SettingsScreen, POIListScreen, FilterScreen } from './src/screens';
+import { HomeScreen, DetailScreen, LoginScreen, RegisterScreen, SettingsScreen, POIListScreen, FilterScreen } from './screens';
 
 // Enable screens
 enableScreens();
