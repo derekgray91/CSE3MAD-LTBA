@@ -1,19 +1,19 @@
 // src/screens/POIListScreen.js
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
   ActivityIndicator,
-  SafeAreaView 
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useFocusEffect } from '@react-navigation/native';
-import { poiService } from '../services';
 import POICard from '../components/POICard';
+import * as poiService from '../services/firebase/poiService';
 
 const POIListScreen = ({ navigation }) => {
   const [pois, setPois] = useState([]);
@@ -30,25 +30,37 @@ const POIListScreen = ({ navigation }) => {
     }, [])
   );
 
-  // Load POIs from Firebase
-  const loadPOIs = async () => {
-    setLoading(true);
-    try {
-      const response = await poiService.getAllPOIs();
-      if (response.success) {
-        setPois(response.data);
-        setFilteredPois(response.data);
-        applySort(response.data, sortBy);
-      } else {
-        setError('Failed to load points of interest');
-      }
-    } catch (err) {
-      console.error('Error loading POIs:', err);
-      setError('An error occurred while loading data');
-    } finally {
-      setLoading(false);
+// Load POIs from Firebase
+const loadPOIs = async () => {
+  setLoading(true);
+  try {
+    // 1) fetch & log the full response
+    const response = await poiService.getAllPOIs();
+    console.log('getAllPOIs response:', response);
+
+    if (response.success) {
+      // 2) log how many documents we got back
+      console.log(`Loaded ${response.data.length} POIs from Firestore`);
+
+      setPois(response.data);
+      setFilteredPois(response.data);
+      applySort(response.data, sortBy);
+
+      // clear any previous error
+      setError(null);
+    } else {
+      console.warn('poiService.getAllPOIs returned success=false:', response.error);
+      setError('Failed to load points of interest');
     }
-  };
+  } catch (err) {
+    // 3) log the full error and show its message in the UI
+    console.error('Error loading POIs:', err);
+    const msg = err.message || err.toString() || 'Unknown error';
+    setError(`Error loading POIs: ${msg}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Handle search
   useEffect(() => {
@@ -56,7 +68,7 @@ const POIListScreen = ({ navigation }) => {
       setFilteredPois(pois);
     } else {
       const lowerCaseSearch = searchText.toLowerCase();
-      const filtered = pois.filter(poi => 
+      const filtered = pois.filter(poi =>
         poi.name.toLowerCase().includes(lowerCaseSearch) ||
         poi.buildingName.toLowerCase().includes(lowerCaseSearch)
       );
@@ -69,7 +81,7 @@ const POIListScreen = ({ navigation }) => {
     const sorted = [...data];
     if (sortType === 'name') {
       sorted.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortType === 'rating') {
+    } else {
       sorted.sort((a, b) => {
         const ratingA = a.averageRating || 0;
         const ratingB = b.averageRating || 0;
@@ -121,7 +133,6 @@ const POIListScreen = ({ navigation }) => {
   // Render empty state
   const renderEmptyList = () => {
     if (loading) return null;
-    
     return (
       <View style={styles.emptyContainer}>
         <Icon name="search-off" size={60} color="#999" />
@@ -151,24 +162,17 @@ const POIListScreen = ({ navigation }) => {
           </TouchableOpacity>
         ) : null}
       </View>
-      
+
       <View style={styles.filterSortContainer}>
-        <TouchableOpacity 
-          style={styles.filterButton} 
-          onPress={goToFilter}
-        >
+        <TouchableOpacity style={styles.filterButton} onPress={goToFilter}>
           <Icon name="filter-list" size={24} color="#666" />
           <Text style={styles.filterButtonText}>Filter</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.sortButton} 
-          onPress={toggleSort}
-        >
-          <Icon 
-            name={sortBy === 'name' ? 'sort-by-alpha' : 'star'} 
-            size={24} 
-            color="#666" 
+        <TouchableOpacity style={styles.sortButton} onPress={toggleSort}>
+          <Icon
+            name={sortBy === 'name' ? 'sort-by-alpha' : 'star'}
+            size={24}
+            color="#666"
           />
           <Text style={styles.sortButtonText}>
             Sort by: {sortBy === 'name' ? 'Name' : 'Rating'}
@@ -181,7 +185,7 @@ const POIListScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
-      
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6200ee" />
@@ -211,10 +215,7 @@ const POIListScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
   headerContainer: {
     backgroundColor: '#fff',
     padding: 12,
@@ -229,52 +230,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 12,
   },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    fontSize: 16,
-  },
+  searchIcon: { marginRight: 8 },
+  searchInput: { flex: 1, height: 40, fontSize: 16 },
   filterSortContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-  },
-  filterButtonText: {
-    marginLeft: 4,
-    fontSize: 14,
-    color: '#666',
-  },
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-  },
-  sortButtonText: {
-    marginLeft: 4,
-    fontSize: 14,
-    color: '#666',
-  },
-  listContent: {
-    padding: 16,
-    paddingBottom: 24,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#666',
-  },
+  filterButton: { flexDirection: 'row', alignItems: 'center', padding: 8 },
+  filterButtonText: { marginLeft: 4, fontSize: 14, color: '#666' },
+  sortButton: { flexDirection: 'row', alignItems: 'center', padding: 8 },
+  sortButtonText: { marginLeft: 4, fontSize: 14, color: '#666' },
+  listContent: { padding: 16, paddingBottom: 24 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { marginTop: 12, fontSize: 16, color: '#666' },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -295,16 +263,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     elevation: 2,
   },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-  },
+  retryButtonText: { color: '#fff', fontSize: 16, fontWeight: '500' },
+  emptyContainer: { alignItems: 'center', justifyContent: 'center', padding: 40 },
   emptyText: {
     fontSize: 18,
     fontWeight: 'bold',

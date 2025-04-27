@@ -1,16 +1,24 @@
+// src/components/POICard.js
+
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import StarRating from './StarRating';
 
 const POICard = ({ poi, onPress }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={() => onPress(poi)}>
       <Image 
-        source={poi.thumbnail ? { uri: poi.thumbnail } : require('../assets/default-poi.png')} 
+        source={
+          poi.thumbnail 
+            ? { uri: poi.thumbnail } 
+            : require('../assets/default-poi.png')
+        } 
         style={styles.thumbnail} 
       />
       <View style={styles.contentContainer}>
-        <Text style={styles.name} numberOfLines={1}>{poi.name}</Text>
+        <Text style={styles.name} numberOfLines={1}>
+          {poi.name}
+        </Text>
         <Text style={styles.description} numberOfLines={2}>
           {poi.buildingName}, Level {poi.levelNumber}
         </Text>
