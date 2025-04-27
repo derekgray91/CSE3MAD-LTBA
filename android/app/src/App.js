@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { enableScreens } from 'react-native-screens';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, { useEffect, useState } from 'react';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { enableScreens } from 'react-native-screens';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Import screens
-import { HomeScreen, DetailScreen, LoginScreen, RegisterScreen, SettingsScreen, POIListScreen, FilterScreen } from './src/screens';
+import { FilterScreen, HomeScreen, LoginScreen, POIListScreen, RegisterScreen, SettingsScreen } from './screens';
 
 // Enable screens
 enableScreens();

@@ -2007,7 +2007,12 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-firebase/app@^21.13.0":
+"@react-native-community/slider@^4.5.6":
+  version "4.5.6"
+  resolved "https://registry.npmjs.org/@react-native-community/slider/-/slider-4.5.6.tgz"
+  integrity sha512-UhLPFeqx0YfPLrEz8ffT3uqAyXWu6iqFjohNsbp4cOU7hnJwg2RXtDnYHoHMr7MOkZDVdlLMdrSrAuzY6KGqrg==
+
+"@react-native-firebase/app@^21.14.0":
   version "21.14.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-21.14.0.tgz"
   integrity sha512-vBNfn7PoQrZfANLJnJiWZSHVu7WG6hjM5w3MDfmG8DLdr8VsAVBUgsn8lGpqobSuno1vTgwDIhR8PYZjMGsuvg==
@@ -2021,7 +2026,7 @@
   dependencies:
     plist "^3.1.0"
 
-"@react-native-firebase/firestore@^21.13.0":
+"@react-native-firebase/firestore@^21.14.0":
   version "21.14.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-21.14.0.tgz"
   integrity sha512-nk8i4le8uQeydRo1JymUCUOWprVK8FUlgtjG0ZG3ne7qt7NvmzgoK59KGwP+G5e8th2wWgACDHmvRrQK6ctXlA==
@@ -2030,6 +2035,11 @@
   version "21.14.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/storage/-/storage-21.14.0.tgz"
   integrity sha512-aI3ufzrz6vhrj/oE5i2dQ42xavS3sr1lWySpaBSfoF304vWwV9RqUIZTKQAsaB8PktDO0a3IMwnYwZrx56IddQ==
+
+"@react-native-picker/picker@^2.11.0":
+  version "2.11.0"
+  resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-2.11.0.tgz"
+  integrity sha512-QuZU6gbxmOID5zZgd/H90NgBnbJ3VV6qVzp6c7/dDrmWdX8S0X5YFYgDcQFjE3dRen9wB9FWnj2VVdPU64adSg==
 
 "@react-native/assets-registry@0.79.0":
   version "0.79.0"
@@ -2266,6 +2276,14 @@
   integrity sha512-SBh/3G7pURIQfIwG4OnAfLvq0E4+l1Ii6577z22cIhWIrTOHFXg0rMxC7ft/amzxYn+iG2nYa4dONRd+xIs+yg==
   dependencies:
     nanoid "3.3.8"
+
+"@react-navigation/stack@^7.2.10":
+  version "7.2.10"
+  resolved "https://registry.npmjs.org/@react-navigation/stack/-/stack-7.2.10.tgz"
+  integrity sha512-8exYxg/3goQkmtAJFIPpKbFOiMmNRSf99qs5ssX1gQ2JEhwloBl7Bw0snccB1JJ7rghjD5bogj+zcQdC8KSYeg==
+  dependencies:
+    "@react-navigation/elements" "^2.3.8"
+    color "^4.2.3"
 
 "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -6304,7 +6322,7 @@ react-native-reanimated@^3.17.3:
     invariant "^2.2.4"
     react-native-is-edge-to-edge "1.1.7"
 
-react-native-safe-area-context@^5.3.0:
+react-native-safe-area-context@^5.4.0:
   version "5.4.0"
   resolved "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-5.4.0.tgz"
   integrity sha512-JaEThVyJcLhA+vU0NU8bZ0a1ih6GiF4faZ+ArZLqpYbL6j7R3caRqj+mE3lEtKCuHgwjLg3bCxLL1GPUJZVqUA==
