@@ -1,15 +1,16 @@
+import 'react-native-gesture-handler';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { enableScreens } from 'react-native-screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
-import { StatusBar } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { enableScreens } from 'react-native-screens';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Import screens
-import { FilterScreen, HomeScreen, LoginScreen, POIListScreen, RegisterScreen, SettingsScreen } from './screens';
+import { HomeScreen, DetailScreen, LoginScreen, RegisterScreen, SettingsScreen, POIListScreen, FilterScreen } from './screens';
 
 // Enable screens
 enableScreens();
