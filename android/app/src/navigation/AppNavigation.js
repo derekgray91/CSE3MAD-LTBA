@@ -1,81 +1,43 @@
-import React from 'react';
+// src/navigation/AppNavigation.js
+
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// Import screens
-import { POIListScreen, FilterScreen } from '../screens';
+// Import your real screens
+import DetailedPOI from '../screens/DetailedPOI';
+import FilterScreen from '../screens/FilterScreen';
+import HomeScreen from '../screens/HomeScreen';
+import POIListScreen from '../screens/POIListScreen';
 
-// Create navigators
+// Placeholder for any screens not yet implemented
+const PlaceholderScreen = () => null;
+
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-
-// Bottom tab navigator
-const MainTabNavigator = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#6200ee',
-        tabBarInactiveTintColor: '#757575',
-        tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopColor: '#e0e0e0',
-        },
-        headerShown: false,
-      }}
-    >
-      <Tab.Screen
-        name="Map"
-        component={MapStackNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="map" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="POIs"
-        component={POIStackNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="place" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsStackNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="settings" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
+const Tab   = createBottomTabNavigator();
 
 // Map stack navigator
-const MapStackNavigator = () => {
+function MapStackNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="MapScreen"
-        component={PlaceholderScreen} // Replace with actual Map screen when implemented
+        component={HomeScreen}
         options={{ title: 'Campus Map' }}
       />
       <Stack.Screen
         name="DetailedPOI"
-        component={PlaceholderScreen} // Replace with actual DetailedPOI screen when implemented
-        options={{ title: 'Location Details' }}
+        component={DetailedPOI}
+        options={{ title: 'Location Testing' }}
       />
     </Stack.Navigator>
   );
-};
+}
 
 // POI stack navigator
-const POIStackNavigator = () => {
+function POIStackNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -90,69 +52,92 @@ const POIStackNavigator = () => {
       />
       <Stack.Screen
         name="DetailedPOI"
-        component={PlaceholderScreen} // Replace with actual DetailedPOI screen when implemented
-        options={{ title: 'Location Details' }}
+        component={DetailedPOI}
+        options={{ title: 'Location Testing' }}
       />
       <Stack.Screen
         name="WriteReview"
-        component={PlaceholderScreen} // Replace with actual WriteReview screen when implemented
+        component={PlaceholderScreen}
         options={{ title: 'Write a Review' }}
       />
     </Stack.Navigator>
   );
-};
+}
 
-// Settings stack navigator
-const SettingsStackNavigator = () => {
+// Settings stack navigator (placeholders)
+function SettingsStackNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="SettingsScreen"
-        component={PlaceholderScreen} // Replace with actual Settings screen when implemented
+        name="Settings"
+        component={PlaceholderScreen}
         options={{ title: 'Settings' }}
       />
       <Stack.Screen
-        name="ChangeNameScreen"
-        component={PlaceholderScreen} // Replace with actual ChangeName screen when implemented
+        name="ChangeName"
+        component={PlaceholderScreen}
         options={{ title: 'Change Display Name' }}
       />
       <Stack.Screen
-        name="ChangePasswordScreen"
-        component={PlaceholderScreen} // Replace with actual ChangePassword screen when implemented
+        name="ChangePassword"
+        component={PlaceholderScreen}
         options={{ title: 'Change Password' }}
       />
       <Stack.Screen
-        name="MyReviewsScreen"
-        component={PlaceholderScreen} // Replace with actual MyReviews screen when implemented
+        name="MyReviews"
+        component={PlaceholderScreen}
         options={{ title: 'My Reviews' }}
       />
     </Stack.Navigator>
   );
-};
+}
 
-// Authentication stack navigator
-const AuthStackNavigator = () => {
+// Main bottom-tabs navigator
+function MainTabNavigator() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={PlaceholderScreen} /> 
-      <Stack.Screen name="Register" component={PlaceholderScreen} />
-    </Stack.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#6200ee',
+        tabBarInactiveTintColor: '#757575',
+        tabBarStyle: { backgroundColor: '#fff', borderTopColor: '#e0e0e0' },
+      }}
+    >
+      <Tab.Screen
+        name="Map"
+        component={MapStackNavigator}
+        options={{
+          tabBarIcon: ({ color, size }) => <Icon name="map" color={color} size={size} />,
+        }}
+      />
+      <Tab.Screen
+        name="POIs"
+        component={POIStackNavigator}
+        options={{
+          tabBarIcon: ({ color, size }) => <Icon name="place" color={color} size={size} />,
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsStackNavigator}
+        options={{
+          tabBarIcon: ({ color, size }) => <Icon name="settings" color={color} size={size} />,
+        }}
+      />
+    </Tab.Navigator>
   );
-};
+}
 
-// Placeholder screen for screens not yet implemented
-const PlaceholderScreen = () => null;
+// Root navigator
+export default function AppNavigation() {
+  // Flip to 'true' (or wire up your auth logic) to show the main app
+  const isAuthenticated = true;
 
-// Root navigator that determines whether to show Auth or App flow
-const RootNavigator = () => {
-  // Here you would normally check if user is authenticated
-  const isAuthenticated = false;
-  
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainTabNavigator /> : <AuthStackNavigator />}
+      {isAuthenticated
+        ? <MainTabNavigator />
+        : <PlaceholderScreen />  /* Replace with your Auth flow when ready */}
     </NavigationContainer>
   );
-};
-
-export default RootNavigator;
+}
