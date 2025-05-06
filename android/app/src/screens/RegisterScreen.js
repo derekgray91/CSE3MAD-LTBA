@@ -23,13 +23,15 @@ export default function RegisterScreen({ navigation }) {
     }
 
     try {
-      await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      await userCredential.user.updateProfile({ displayName: name });
       Alert.alert('Registration successful');
       navigation.navigate('Login');
     } catch (error) {
       Alert.alert('Registration Failed', error.message);
     }
   };
+
 
   return (
     <View style={styles.container}>
