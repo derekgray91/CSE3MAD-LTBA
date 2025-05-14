@@ -1,35 +1,43 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const StarRating = ({ rating = 0, size = 20, color = '#FFD700', containerStyle }) => {
-  // Ensure rating is within 0-5 range
-  const safeRating = Math.min(5, Math.max(0, rating));
+const StarRating = ({ 
+  rating = 0, 
+  size = 20, 
+  color = '#FFD700', 
+  containerStyle,
+  editable = false,
+  onRatingChange
+}) => {
+  // Ensure rating is within 0-5 range and is a valid number
+  const safeRating = !rating || isNaN(Number(rating)) 
+    ? 0 
+    : Math.min(5, Math.max(0, Number(rating)));
+  
+  const handleStarPress = (selectedRating) => {
+    if (editable && onRatingChange) {
+      onRatingChange(selectedRating);
+    }
+  };
   
   const renderStars = () => {
     const stars = [];
     
-    // Full stars
-    const fullStars = Math.floor(safeRating);
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Icon key={`full-${i}`} name="star" size={size} color={color} />
+    for (let i = 1; i <= 5; i++) {
+      const starIcon = i <= safeRating ? 'star' : 'star-outline';
+      const star = editable ? (
+        <TouchableOpacity
+          key={i}
+          onPress={() => handleStarPress(i)}
+          activeOpacity={0.7}
+        >
+          <Icon name={starIcon} size={size} color={color} />
+        </TouchableOpacity>
+      ) : (
+        <Icon key={i} name={starIcon} size={size} color={color} />
       );
-    }
-    
-    // Half star
-    if (safeRating % 1 >= 0.5) {
-      stars.push(
-        <Icon key="half" name="star-half" size={size} color={color} />
-      );
-    }
-    
-    // Empty stars
-    const emptyStars = 5 - Math.ceil(safeRating);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <Icon key={`empty-${i}`} name="star-outline" size={size} color={color} />
-      );
+      stars.push(star);
     }
     
     return stars;
@@ -46,6 +54,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4, // Add spacing between stars
   },
 });
 

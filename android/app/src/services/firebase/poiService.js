@@ -1,6 +1,7 @@
 // src/services/firestore/poiService.js
 
 import { auth, firestore, storage } from '../index';
+import { getReviewsForPOI } from './reviewService';
 
 // ——————————————————————————————————
 // REST config for your non-default "ltba" database
@@ -45,6 +46,38 @@ function flattenDoc(doc) {
   return out;
 }
 
+// Helper function to get review stats for a POI
+const getPOIReviewStats = async (poiId) => {
+  const reviewsRes = await getReviewsForPOI(poiId);
+  return reviewsRes.success ? reviewsRes.stats : { averageRating: 0, reviewCount: 0 };
+};
+
+// Helper to convert gs:// URLs to HTTP URLs
+const getHttpUrl = async (gsUrl) => {
+  if (!gsUrl || !gsUrl.startsWith('gs://')) return gsUrl;
+  try {
+    const ref = storage.refFromURL(gsUrl);
+    return await ref.getDownloadURL();
+  } catch (e) {
+    console.error('Error converting gs:// to HTTP:', gsUrl, e);
+    return null;
+  }
+};
+
+// Helper to convert POI image fields
+const convertPOIImages = async (poi) => {
+  let thumbnail = poi.thumbnail;
+  let images = poi.images;
+  if (thumbnail) {
+    thumbnail = await getHttpUrl(thumbnail);
+  }
+  if (Array.isArray(images)) {
+    images = await Promise.all(images.map(async (img) => await getHttpUrl(img)));
+    images = images.filter(Boolean);
+  }
+  return { ...poi, thumbnail, images };
+};
+
 // ——————————————————————————————————
 // REST-backed methods
 // ——————————————————————————————————
@@ -57,8 +90,22 @@ export const getAllPOIs = async () => {
     if (json.error) throw new Error(json.error.message);
 
     const docs = json.documents || [];
-    const data = docs.map(flattenDoc);
-    return { success: true, data };
+    const pois = docs.map(flattenDoc);
+
+    // Get review stats and convert images for each POI
+    const poisWithStats = await Promise.all(
+      pois.map(async (poi) => {
+        const stats = await getPOIReviewStats(poi.id);
+        const poiWithImages = await convertPOIImages(poi);
+        return {
+          ...poiWithImages,
+          averageRating: stats.averageRating,
+          reviewCount: stats.reviewCount
+        };
+      })
+    );
+
+    return { success: true, data: poisWithStats };
   } catch (error) {
     console.error('Error fetching POIs via REST:', error);
     return { success: false, error };
@@ -75,7 +122,9 @@ export const getPOIsByCategory = async (categoryId) => {
     const docs = json.documents || [];
     const all  = docs.map(flattenDoc);
     const data = all.filter(poi => poi.categoryId === categoryId);
-    return { success: true, data };
+    // Convert images for each POI
+    const dataWithImages = await Promise.all(data.map(convertPOIImages));
+    return { success: true, data: dataWithImages };
   } catch (error) {
     console.error('Error fetching POIs by category via REST:', error);
     return { success: false, error };
@@ -89,8 +138,18 @@ export const getPOIById = async (poiId) => {
     const json    = await resp.json();
     if (json.error) throw new Error(json.error.message);
 
-    const data = flattenDoc(json);
-    return { success: true, data };
+    const poi = flattenDoc(json);
+    const stats = await getPOIReviewStats(poiId);
+    const poiWithImages = await convertPOIImages(poi);
+    
+    return { 
+      success: true, 
+      data: {
+        ...poiWithImages,
+        averageRating: stats.averageRating,
+        reviewCount: stats.reviewCount
+      }
+    };
   } catch (error) {
     console.error('Error fetching single POI via REST:', error);
     return { success: false, error };
@@ -112,7 +171,9 @@ export const searchPOIs = async (searchText) => {
         poi.name.toLowerCase().includes(lower) ||
         poi.buildingName.toLowerCase().includes(lower)
       );
-    return { success: true, data };
+    // Convert images for each POI
+    const dataWithImages = await Promise.all(data.map(convertPOIImages));
+    return { success: true, data: dataWithImages };
   } catch (error) {
     console.error('Error searching POIs via REST:', error);
     return { success: false, error };
@@ -132,7 +193,9 @@ export const filterPOIs = async (filters) => {
     if (filters.buildingName) data = data.filter(poi => poi.buildingName === filters.buildingName);
     if (filters.minRating > 0) data = data.filter(poi => (poi.averageRating || 0) >= filters.minRating);
 
-    return { success: true, data };
+    // Convert images for each POI
+    const dataWithImages = await Promise.all(data.map(convertPOIImages));
+    return { success: true, data: dataWithImages };
   } catch (error) {
     console.error('Error filtering POIs via REST:', error);
     return { success: false, error };

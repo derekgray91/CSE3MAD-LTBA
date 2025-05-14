@@ -4,8 +4,11 @@ import {
   Image, Pressable, TextInput
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { updateUserProfile, syncUserToFirestoreREST } from '../services/firebase/userService';
 
 export default function SettingsScreen() {
+  const navigation = useNavigation();
   const user = auth().currentUser;
   const displayName = user?.displayName || 'User';
 
@@ -56,9 +59,8 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
       <Image
-        source={{ uri: 'https://i.pravatar.cc/100' }}
+        source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/microhabit-90960.firebasestorage.app/o/users%2Fdefault.jpg?alt=media&token=5e60efc2-03d4-4269-b423-58623111f8c8' }}
         style={styles.avatar}
       />
       <Text style={styles.name}>{user?.displayName || 'User'}</Text>
@@ -73,7 +75,7 @@ export default function SettingsScreen() {
         <Text style={styles.arrow}>›</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.row}>
+      <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('MyReviews')}>
         <Text style={styles.label}>My reviews</Text>
         <Text style={styles.arrow}>›</Text>
       </TouchableOpacity>

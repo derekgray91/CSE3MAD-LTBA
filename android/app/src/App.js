@@ -18,7 +18,8 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import POIListScreen from './screens/POIListScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import SettingsScreen from './screens/SettingsScreen';
+import { SettingsStackNavigator } from './navigation/AppNavigation';
+import MyReviewsScreen from './screens/MyReviewsScreen';  
 
 // Enable native screens for better performance
 enableScreens();
@@ -42,8 +43,19 @@ function POIStackNavigator() {
       />
       <Stack.Screen
         name="DetailedPOI"
-        component={DetailedPOI}          // ← Use your real detail screen here
-        options={{ title: 'Location Details' }}
+        component={DetailedPOI}
+        options={{
+          headerShown: true,
+          headerTitle: 'Location Details',
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#fff',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: '#e0e0e0'
+          }
+        }}
       />
     </Stack.Navigator>
   );
@@ -76,7 +88,7 @@ function MainTabNavigator() {
       />
       <Tab.Screen
         name="Settings"
-        component={SettingsScreen}
+        component={SettingsStackNavigator}
         options={{
           tabBarIcon: ({ color, size }) => <Icon name="settings" color={color} size={size} />
         }}

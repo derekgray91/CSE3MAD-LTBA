@@ -8,6 +8,7 @@ import {
   Alert
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import { syncUserToFirestoreREST } from '../services/firebase/userService';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -25,6 +26,7 @@ export default function RegisterScreen({ navigation }) {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       await userCredential.user.updateProfile({ displayName: name });
+      await syncUserToFirestoreREST();
       Alert.alert('Registration successful');
       navigation.navigate('Login');
     } catch (error) {

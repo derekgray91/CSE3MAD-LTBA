@@ -11,6 +11,8 @@ import DetailedPOI from '../screens/DetailedPOI';
 import FilterScreen from '../screens/FilterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import POIListScreen from '../screens/POIListScreen';
+import MyReviewsScreen from '../screens/MyReviewsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 // Placeholder for any screens not yet implemented
 const PlaceholderScreen = () => null;
@@ -55,22 +57,17 @@ function POIStackNavigator() {
         component={DetailedPOI}
         options={{ title: 'Location Testing' }}
       />
-      <Stack.Screen
-        name="WriteReview"
-        component={PlaceholderScreen}
-        options={{ title: 'Write a Review' }}
-      />
     </Stack.Navigator>
   );
 }
 
 // Settings stack navigator (placeholders)
-function SettingsStackNavigator() {
+export function SettingsStackNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="Settings"
-        component={PlaceholderScreen}
+        component={SettingsScreen}
         options={{ title: 'Settings' }}
       />
       <Stack.Screen
@@ -85,7 +82,7 @@ function SettingsStackNavigator() {
       />
       <Stack.Screen
         name="MyReviews"
-        component={PlaceholderScreen}
+        component={MyReviewsScreen}
         options={{ title: 'My Reviews' }}
       />
     </Stack.Navigator>

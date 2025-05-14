@@ -56,14 +56,17 @@ export default function HomeScreen({ navigation }) {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {/* Search Bar */}
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search for points of interest..."
-        onChangeText={setSearchText}
-        value={searchText}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search for points of interest..."
+          onChangeText={setSearchText}
+          value={searchText}
+          placeholderTextColor="#666"
+        />
+      </View>
 
       {/* Loading Indicator */}
       {loading && (
@@ -75,7 +78,7 @@ export default function HomeScreen({ navigation }) {
       {/* Map */}
       {!loading && (
         <MapView
-          style={{ flex: 1 }}
+          style={styles.map}
           initialRegion={{
             latitude: filteredPois[0]?.latitude || -37.6763,
             longitude: filteredPois[0]?.longitude || 145.0459,
@@ -123,7 +126,7 @@ export default function HomeScreen({ navigation }) {
                   setModalVisible(false);
                   navigation.navigate('POIs', {
                     screen: 'DetailedPOI',
-                    params: { poiId: selectedPOI.id },
+                    params: { poiId: selectedPOI.id }
                   });
                 }}
               >
@@ -149,17 +152,34 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  searchBar: {
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  searchContainer: {
     position: 'absolute',
-    top: 10,
-    left: 10,
-    right: 10,
-    height: 40,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    paddingHorizontal: 12,
+    top: 70, // Increased top margin
+    left: 16,
+    right: 16,
     zIndex: 2,
-    elevation: 2,
+  },
+  searchBar: {
+    height: 48,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  map: {
+    flex: 1,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,

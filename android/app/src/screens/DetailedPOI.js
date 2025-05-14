@@ -7,34 +7,138 @@ import {
     ScrollView,
     StyleSheet,
     Text,
-    View
+    View,
+    Alert,
+    TouchableOpacity
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import StarRating from '../components/StarRating';
+import ReviewForm from '../components/ReviewForm';
+import ReviewList from '../components/ReviewList';
 import { getPOIById } from '../services/firebase/poiService';
+import { addReview, getReviewsForPOI } from '../services/firebase/reviewService';
+import { getCategoryById } from '../services/firebase/categoryService';
 
 export default function DetailedPOI({ route }) {
+  const navigation = useNavigation();
   const { poiId } = route.params;
-  const [poi, setPoi]         = useState(null);
+  const [poi, setPoi] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewStats, setReviewStats] = useState({ averageRating: 0, reviewCount: 0 });
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState(null);
+  const [categoryName, setCategoryName] = useState('');
+
+  // Set up the header with back button
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+      ),
+      headerTitle: 'Location Details',
+      headerTitleAlign: 'center',
+      headerStyle: {
+        backgroundColor: '#fff',
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0'
+      }
+    });
+  }, [navigation]);
+
+  const loadPOIAndReviews = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Loading POI with ID:', poiId);
+      
+      if (!poiId) {
+        throw new Error('POI ID is missing');
+      }
+      
+      const poiResult = await getPOIById(poiId);
+      console.log('POI Result:', poiResult);
+      
+      if (!poiResult.success) {
+        throw new Error(poiResult.error?.message || 'Failed to load POI details');
+      }
+      
+      setPoi(poiResult.data);
+      console.log('POI Data loaded successfully:', poiResult.data);
+      
+      // Fetch category name
+      if (poiResult.data.categoryId) {
+        const catRes = await getCategoryById(poiResult.data.categoryId);
+        if (catRes.success && catRes.data && catRes.data.categoryName) {
+          setCategoryName(catRes.data.categoryName);
+        } else {
+          setCategoryName(poiResult.data.categoryId);
+        }
+      } else {
+        setCategoryName('');
+      }
+      
+      // Load reviews
+      console.log('Fetching reviews for POI:', poiId);
+      const reviewsResult = await getReviewsForPOI(poiId);
+      console.log('Reviews Result:', reviewsResult);
+      
+      if (!reviewsResult.success) {
+        throw new Error(reviewsResult.error?.message || 'Failed to load reviews');
+      }
+      
+      console.log('Reviews data:', reviewsResult.data);
+      console.log('Reviews stats:', reviewsResult.stats);
+      
+      // Check if reviews data is valid
+      if (!Array.isArray(reviewsResult.data)) {
+        console.error('Reviews data is not an array:', reviewsResult.data);
+        setReviews([]);
+      } else {
+        setReviews(reviewsResult.data);
+      }
+      
+      // Check if stats are valid
+      if (!reviewsResult.stats) {
+        console.error('Review stats are missing');
+        setReviewStats({ averageRating: 0, reviewCount: 0 });
+      } else {
+        setReviewStats(reviewsResult.stats);
+      }
+    } catch (error) {
+      console.error('Error in loadPOIAndReviews:', error);
+      setError(error.message || 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await getPOIById(poiId);
-        if (res.success) {
-          setPoi(res.data);
-        } else {
-          setError(res.error?.message || 'Failed to load location');
-        }
-      } catch (err) {
-        console.error('[DetailedPOI] unexpected error:', err);
-        setError(err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    })();
+    loadPOIAndReviews();
   }, [poiId]);
+
+  const handleReviewSubmit = async (rating, comment) => {
+    try {
+      const res = await addReview(poiId, rating, comment);
+      if (res.success) {
+        Alert.alert('Success', 'Review submitted successfully');
+        await loadPOIAndReviews(); // Reload POI and reviews to show the new review
+        return { success: true };
+      } else {
+        throw new Error(res.error?.message || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error('[DetailedPOI] Review submission error:', error);
+      return { success: false, error };
+    }
+  };
 
   if (loading) {
     return (
@@ -81,23 +185,23 @@ export default function DetailedPOI({ route }) {
 
       {/* Rating */}
       <View style={styles.ratingRow}>
-        <StarRating rating={poi.averageRating || 0} size={24} />
+        <StarRating rating={reviewStats.averageRating} size={24} />
         <Text style={styles.reviewCount}>
-          ({poi.reviewCount || 0} reviews)
+          ({reviewStats.reviewCount} reviews)
         </Text>
       </View>
 
       {/* Other fields */}
       <View style={styles.field}>
         <Text style={styles.fieldLabel}>Category</Text>
-        <Text style={styles.fieldValue}>{poi.categoryId}</Text>
+        <Text style={styles.fieldValue}>{categoryName}</Text>
       </View>
-      <View style={styles.field}>
-        <Text style={styles.fieldLabel}>Coordinates</Text>
-        <Text style={styles.fieldValue}>
-          {poi.latitude}, {poi.longitude}
-        </Text>
-      </View>
+
+      {/* Review Form */}
+      <ReviewForm poiId={poiId} onSubmit={handleReviewSubmit} />
+
+      {/* Review List */}
+      <ReviewList reviews={reviews || []} />
     </ScrollView>
   );
 }
@@ -156,5 +260,8 @@ const styles = StyleSheet.create({
     color: '#B00020',
     fontSize: 16,
     textAlign: 'center'
+  },
+  backButton: {
+    padding: 8
   }
 });
