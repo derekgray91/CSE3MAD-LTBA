@@ -28,5 +28,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBzFmTM-7pO7fmHKBzryggP6sdGiz8OCVM" />
             
+        <!-- Enable the Performance collector service -->
+        <service
+        android:name="com.google.firebase.perf.FirebasePerformanceCollectorService"
+        android:enabled="true"
+        android:exported="false"/>
     </application>
 </manifest>

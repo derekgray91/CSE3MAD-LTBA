@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import Slider from '@react-native-community/slider';
+import perf from '@react-native-firebase/perf'; // ← added
+import { Picker } from '@react-native-picker/picker';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { categoryService, poiService } from '../services';
 
@@ -20,15 +21,15 @@ const FilterScreen = ({ navigation, route }) => {
   // Filter state
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBuilding, setSelectedBuilding] = useState('');
-  const [minRating, setMinRating] = useState(0);
+  const [minRating, setMinRating]               = useState(0);
   
   // Data for filters
-  const [categories, setCategories] = useState([]);
-  const [buildings, setBuildings] = useState([]);
+  const [categories, setCategories]             = useState([]);
+  const [buildings, setBuildings]               = useState([]);
   
   // UI state
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading]                   = useState(true);
+  const [error, setError]                       = useState(null);
 
   // Load filter data when component mounts
   useEffect(() => {
@@ -70,7 +71,10 @@ const FilterScreen = ({ navigation, route }) => {
   };
 
   // Apply filters and return to previous screen
-  const applyFilters = () => {
+  const applyFilters = async () => {
+    const trace = await perf().newTrace('filter_operation');
+    trace.start();
+
     const filters = {
       categoryId: selectedCategory || null,
       buildingName: selectedBuilding || null,
@@ -84,6 +88,8 @@ const FilterScreen = ({ navigation, route }) => {
     
     // Go back to previous screen
     navigation.goBack();
+
+    trace.stop();
   };
 
   // Reset all filters
@@ -205,7 +211,7 @@ const FilterScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.applyButton}
-          onPress={applyFilters}
+          onPress={applyFilters}   // ← now traced
         >
           <Text style={styles.applyButtonText}>Apply Filters</Text>
         </TouchableOpacity>

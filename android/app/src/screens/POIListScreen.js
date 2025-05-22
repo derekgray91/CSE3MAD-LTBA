@@ -1,9 +1,9 @@
-// src/screens/POIListScreen.js
-
+import perf from '@react-native-firebase/perf'; // ← added
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
   SafeAreaView,
   StyleSheet,
@@ -11,13 +11,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import POICard from '../components/POICard';
 import POITile from '../components/POITile';
-import * as poiService from '../services/firebase/poiService';
 import * as categoryService from '../services/firebase/categoryService';
+import * as poiService from '../services/firebase/poiService';
 
 // Get screen width to calculate grid item size
 const { width } = Dimensions.get('window');
@@ -27,19 +25,25 @@ const NUM_COLUMNS = 2;
 const ITEM_WIDTH = (width - (PADDING * 2) - (COLUMN_GAP * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
 
 const POIListScreen = ({ navigation }) => {
-  const [pois, setPois] = useState([]);
+  const [pois, setPois]                 = useState([]);
   const [filteredPois, setFilteredPois] = useState([]);
-  const [categories, setCategories] = useState({});
-  const [searchText, setSearchText] = useState('');
-  const [sortBy, setSortBy] = useState('name');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [categories, setCategories]     = useState({});
+  const [searchText, setSearchText]     = useState('');
+  const [sortBy, setSortBy]             = useState('name');
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState(null);
   const [activeFilters, setActiveFilters] = useState(null);
 
   // Load POIs and categories when screen is focused
   useFocusEffect(
     useCallback(() => {
-      loadPOIs();
+      async function measurePoiListLoad() {
+        const trace = await perf().newTrace('poi_list_load');
+        trace.start();
+        await loadPOIs();
+        trace.stop();
+      }
+      measurePoiListLoad();
       loadCategories();
     }, [])
   );
@@ -290,7 +294,6 @@ const styles = StyleSheet.create({
   sortButton: { flexDirection: 'row', alignItems: 'center', padding: 8 },
   sortButtonText: { marginLeft: 4, fontSize: 14, color: '#666' },
   
-  // Grid styles
   gridContainer: { 
     padding: PADDING,
   },
@@ -302,7 +305,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   
-  // Other existing styles
   loadingContainer: {
     flex: 1, justifyContent: 'center', alignItems: 'center'
   },

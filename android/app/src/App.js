@@ -1,6 +1,7 @@
 // App.js
 
 import auth from '@react-native-firebase/auth';
+import perf from '@react-native-firebase/perf'; // ← added import
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -12,14 +13,13 @@ import { enableScreens } from 'react-native-screens';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Import your actual screen components
+import { SettingsStackNavigator } from './navigation/AppNavigation';
 import DetailedPOI from './screens/DetailedPOI';
 import FilterScreen from './screens/FilterScreen';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import POIListScreen from './screens/POIListScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import { SettingsStackNavigator } from './navigation/AppNavigation';
-import MyReviewsScreen from './screens/MyReviewsScreen';  
 
 // Enable native screens for better performance
 enableScreens();
@@ -110,6 +110,17 @@ function AuthStackNavigator() {
 export default function App() {
   const [user, setUser]         = useState(null);
   const [initializing, setInit] = useState(true);
+
+  // ← new effect for cold-start tracing
+  useEffect(() => {
+    async function measureColdStart() {
+      const trace = await perf().newTrace('app_cold_start');
+      trace.start();
+      // (any early init work you do goes here)
+      trace.stop();
+    }
+    measureColdStart();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(u => {

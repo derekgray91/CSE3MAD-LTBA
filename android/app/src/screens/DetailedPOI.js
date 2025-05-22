@@ -1,24 +1,23 @@
-// src/screens/DetailedPOI.js
-
+import perf from '@react-native-firebase/perf'; // ← added
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-    Alert,
-    TouchableOpacity
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import StarRating from '../components/StarRating';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
+import StarRating from '../components/StarRating';
+import { getCategoryById } from '../services/firebase/categoryService';
 import { getPOIById } from '../services/firebase/poiService';
 import { addReview, getReviewsForPOI } from '../services/firebase/reviewService';
-import { getCategoryById } from '../services/firebase/categoryService';
 
 export default function DetailedPOI({ route }) {
   const navigation = useNavigation();
@@ -54,6 +53,9 @@ export default function DetailedPOI({ route }) {
   }, [navigation]);
 
   const loadPOIAndReviews = async () => {
+    const trace = await perf().newTrace('poi_details_load');
+    trace.start();
+
     try {
       setLoading(true);
       setError(null);
@@ -112,10 +114,13 @@ export default function DetailedPOI({ route }) {
       } else {
         setReviewStats(reviewsResult.stats);
       }
+
+      trace.putMetric('reviews_count', reviewsResult.stats?.reviewCount || reviewsResult.data.length);
     } catch (error) {
       console.error('Error in loadPOIAndReviews:', error);
       setError(error.message || 'Failed to load data');
     } finally {
+      trace.stop();
       setLoading(false);
     }
   };
@@ -191,7 +196,7 @@ export default function DetailedPOI({ route }) {
         </Text>
       </View>
 
-      {/* Other fields */}
+      {/* Category */}
       <View style={styles.field}>
         <Text style={styles.fieldLabel}>Category</Text>
         <Text style={styles.fieldValue}>{categoryName}</Text>
@@ -256,12 +261,12 @@ const styles = StyleSheet.create({
   fieldValue: {
     color: '#444'
   },
+  backButton: {
+    padding: 8
+  },
   errorText: {
     color: '#B00020',
     fontSize: 16,
     textAlign: 'center'
-  },
-  backButton: {
-    padding: 8
   }
 });

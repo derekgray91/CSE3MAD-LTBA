@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { getReviewsByUser, getReviewsByUserREST } from '../services/firebase/reviewService';
-import { getPOIById } from '../services/firebase/poiService';
 import auth from '@react-native-firebase/auth';
+import perf from '@react-native-firebase/perf'; // ← added
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import StarRating from '../components/StarRating';
+import { getPOIById } from '../services/firebase/poiService';
+import { getReviewsByUserREST } from '../services/firebase/reviewService';
 
 export default function MyReviewsScreen({ navigation }) {
-  const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [reviews, setReviews]   = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
   const [poiNames, setPoiNames] = useState({});
 
   useEffect(() => {
-    loadReviews();
+    async function measureMyReviewsLoad() {
+      const trace = await perf().newTrace('my_reviews_load');
+      trace.start();
+      await loadReviews();        // ← your existing loader
+      trace.stop();
+    }
+    measureMyReviewsLoad();
   }, []);
 
   const loadReviews = async () => {
@@ -142,4 +149,4 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 32,
   },
-}); 
+});

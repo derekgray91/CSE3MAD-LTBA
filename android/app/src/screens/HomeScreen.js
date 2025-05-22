@@ -1,5 +1,4 @@
-// src/screens/HomeScreen.js
-
+import perf from '@react-native-firebase/perf'; // ← added
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -23,7 +22,13 @@ export default function HomeScreen({ navigation }) {
   const [error, setError]               = useState('');
 
   useEffect(() => {
-    loadPOIs();
+    async function measureHomeLoad() {
+      const trace = await perf().newTrace('home_screen_load');
+      trace.start();
+      await loadPOIs();            // ← your existing loader
+      trace.stop();
+    }
+    measureHomeLoad();
   }, []);
 
   const loadPOIs = async () => {
@@ -158,7 +163,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: 'absolute',
-    top: 70, // Increased top margin
+    top: 70,
     left: 16,
     right: 16,
     zIndex: 2,
