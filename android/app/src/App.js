@@ -133,10 +133,10 @@ export default function App() {
   if (initializing) return null;
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider testID="safe-area-provider">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <NavigationContainer>
-        {user ? <MainTabNavigator /> : <AuthStackNavigator />}
+        {user ? <MainTabNavigator testID="main-tab" /> : <AuthStackNavigator testID="auth-stack" />}
       </NavigationContainer>
     </SafeAreaProvider>
   );
